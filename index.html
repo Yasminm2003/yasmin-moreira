@@ -1055,8 +1055,8 @@
     });
 
     document.getElementById("confirm-ride").addEventListener("click", () => {
-      window.alert(`${selectedRide} selected for ${destination}`);
-      closeFlow();
+      flowTitle.textContent = "Ride selected";
+      document.getElementById("confirm-ride").textContent = `${selectedRide} selected`;
     });
 
     document.getElementById("confirm-schedule").addEventListener("click", () => {
