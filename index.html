@@ -303,6 +303,85 @@
       font-size: 18px;
     }
 
+    .trip-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-bottom: 1px solid #eeeeee;
+    }
+
+    .trip-tab {
+      min-height: 48px;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      background: #ffffff;
+      color: #777777;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .trip-tab[aria-selected="true"] {
+      border-bottom-color: #16a765;
+      color: #111111;
+    }
+
+    .trip-month {
+      padding: 16px 16px 8px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .trip-row {
+      min-height: 66px;
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-bottom: 1px solid #eeeeee;
+    }
+
+    .trip-row[hidden] {
+      display: none;
+    }
+
+    .trip-icon {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #f0f0f0;
+      color: #555555;
+    }
+
+    .trip-info {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+    }
+
+    .trip-info strong {
+      overflow: hidden;
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .trip-info small,
+    .trip-price small {
+      color: #777777;
+      font-size: 10px;
+    }
+
+    .trip-price {
+      display: grid;
+      justify-items: end;
+      gap: 4px;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
     .flow-view {
       position: absolute;
       inset: 0;
@@ -819,6 +898,17 @@
       </div>
     </div>
 
+    <nav class="bottom-nav" aria-label="Navegação principal">
+      <button class="nav-item active" type="button" data-home>
+        <i class="fa-solid fa-house"></i>
+        <span>Home</span>
+      </button>
+      <button class="nav-item" type="button" data-open-flow="trips">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        <span>Activity</span>
+      </button>
+    </nav>
+
     <div class="flow-view" id="flow-view" aria-hidden="true" hidden>
       <header class="flow-header">
         <button class="icon-button" id="flow-back" type="button" aria-label="Voltar">
@@ -958,6 +1048,49 @@
           </select>
           <button class="primary-action" id="confirm-schedule" type="button">Set pick-up time</button>
         </section>
+
+        <section class="flow-panel" data-panel="trips" hidden>
+          <div class="trip-tabs" role="tablist" aria-label="Filtrar viagens">
+            <button class="trip-tab" type="button" role="tab" aria-selected="true" data-trip-filter="all">All</button>
+            <button class="trip-tab" type="button" role="tab" aria-selected="false" data-trip-filter="personal">Personal</button>
+            <button class="trip-tab" type="button" role="tab" aria-selected="false" data-trip-filter="work">Work</button>
+          </div>
+          <div class="trip-list">
+            <h2 class="trip-month">Feb 2023</h2>
+            <article class="trip-row" data-trip-type="personal">
+              <span class="trip-icon"><i class="fa-solid fa-car"></i></span>
+              <span class="trip-info"><strong>Oniru Private Beach, Lagos</strong><small>4 Feb, 17:19</small></span>
+              <span class="trip-price">NGN 0<small>Trip cancelled</small></span>
+            </article>
+            <h2 class="trip-month">Nov 2022</h2>
+            <article class="trip-row" data-trip-type="personal">
+              <span class="trip-icon"><i class="fa-solid fa-car"></i></span>
+              <span class="trip-info"><strong>38 Balarabe Musa Crescent</strong><small>10 Nov, 19:48</small></span>
+              <span class="trip-price">NGN 1,700</span>
+            </article>
+            <article class="trip-row" data-trip-type="work">
+              <span class="trip-icon"><i class="fa-solid fa-car"></i></span>
+              <span class="trip-info"><strong>Shoprite Adeniran, Lagos</strong><small>4 Nov, 16:26</small></span>
+              <span class="trip-price">NGN 2,600</span>
+            </article>
+            <h2 class="trip-month">Oct 2022</h2>
+            <article class="trip-row" data-trip-type="work">
+              <span class="trip-icon"><i class="fa-solid fa-car"></i></span>
+              <span class="trip-info"><strong>Nigerian Institute of International Affairs</strong><small>31 Oct, 18:08</small></span>
+              <span class="trip-price">NGN 900</span>
+            </article>
+            <article class="trip-row" data-trip-type="personal">
+              <span class="trip-icon"><i class="fa-solid fa-car"></i></span>
+              <span class="trip-info"><strong>Balarabe Musa Crescent</strong><small>15 Oct, 13:45</small></span>
+              <span class="trip-price">NGN 4,600</span>
+            </article>
+            <article class="trip-row" data-trip-type="work">
+              <span class="trip-icon"><i class="fa-solid fa-car"></i></span>
+              <span class="trip-info"><strong>Balarabe Musa Crescent</strong><small>15 Oct, 13:43</small></span>
+              <span class="trip-price">NGN 0<small>Trip cancelled</small></span>
+            </article>
+          </div>
+        </section>
       </div>
     </div>
   </div>
@@ -971,7 +1104,8 @@
       rides: "Choose a ride",
       stops: "Add stops",
       pickup: "Choose pick-up",
-      schedule: "Schedule a trip"
+      schedule: "Schedule a trip",
+      trips: "My Trips"
     };
     let activePanel = null;
     let previousPanel = null;
@@ -998,6 +1132,12 @@
     }
 
     document.addEventListener("click", (event) => {
+      const homeButton = event.target.closest("[data-home]");
+      if (homeButton) {
+        closeFlow();
+        return;
+      }
+
       const flowTrigger = event.target.closest("[data-open-flow]");
       if (flowTrigger) {
         showFlow(flowTrigger.dataset.openFlow);
@@ -1031,6 +1171,27 @@
 
       if (event.target.closest(".remove-stop")) {
         event.target.closest(".stop-field").remove();
+        return;
+      }
+
+      const tripTab = event.target.closest("[data-trip-filter]");
+      if (tripTab) {
+        const filter = tripTab.dataset.tripFilter;
+        document.querySelectorAll("[data-trip-filter]").forEach((tab) => {
+          tab.setAttribute("aria-selected", String(tab === tripTab));
+        });
+        document.querySelectorAll(".trip-row").forEach((trip) => {
+          trip.hidden = filter !== "all" && trip.dataset.tripType !== filter;
+        });
+        document.querySelectorAll(".trip-month").forEach((month) => {
+          const monthRows = [];
+          let sibling = month.nextElementSibling;
+          while (sibling && !sibling.classList.contains("trip-month")) {
+            if (sibling.classList.contains("trip-row")) monthRows.push(sibling);
+            sibling = sibling.nextElementSibling;
+          }
+          month.hidden = !monthRows.some((trip) => !trip.hidden);
+        });
       }
     });
 
